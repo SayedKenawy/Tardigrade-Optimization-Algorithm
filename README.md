@@ -1,44 +1,161 @@
 # Tardigrade Optimization Algorithm (TOA)
 
-The **Tardigrade Optimization Algorithm (TOA)** is a contemporary bio-inspired metaheuristic that simulates the extraordinary adaptability of tardigrades—micro-organisms known for their ability to endure extreme environmental stressors. The algorithm incorporates several biological principles, including cryptobiosis, cooperative behavior, exploration–exploitation balancing, and resource-dependent movement dynamics. Together, these mechanisms enable TOA to operate as a highly flexible and robust optimization framework.
+The **Tardigrade Optimization Algorithm (TOA)** is a contemporary **bio-inspired metaheuristic** optimization technique modeled after the adaptable survival behavior of **tardigrades**, microscopic organisms capable of enduring extreme environmental conditions through states like **cryptobiosis** and controlled **energy conservation**.
 
-This implementation enhances the original concept through adaptive exploration control, elite-driven refinement procedures, and a stagnation-escape mechanism designed to help the algorithm avoid local optima. These additions collectively strengthen the algorithm’s performance across a wide array of complex optimization problems.
+This algorithm integrates **exploration–exploitation balancing**, **hunger-driven adaptation**, and **cooperative movement modeling** to provide a versatile and robust optimization framework.  
+
 
 ---
 
 ## Algorithm Overview
 
-TOA integrates several biologically inspired processes:
-
-### **1. Hunger-Driven Movement Mechanics**
-Tardigrades alter their mobility depending on access to resources.  
-In the algorithm, agents regulate search intensity through a dynamically updated hunger level. Higher hunger encourages more aggressive exploration, particularly for solutions that perform poorly, thereby increasing the likelihood of escaping low-quality regions of the search space.
-
-### **2. Cryptobiosis Modeling**
-Cryptobiosis—a dormant survival state—is modeled by enabling highly hungry agents to partially or completely restrict movement.  
-This controlled inactivity reduces unstable late-stage behavior and promotes fine-tuned exploitation once promising regions have been identified.
-
-### **3. Elite-Based Learning and Cooperation**
-TOA identifies a subset of superior agents designated as *elite*. These agents support convergence through several advanced behaviors:
-
-- localized Gaussian search around high-performance regions,  
-- information exchange with the global best solution, and  
-- refined adjustments during the satiation phase.
-
-This layered cooperation structure stabilizes convergence dynamics and enhances solution quality.
-
-### **4. Lévy-Flight-Assisted Exploration**
-Some agents intermittently adopt Lévy-flight movement patterns, enabling long-range transitions.  
-This mechanism introduces significant global diversity and helps the algorithm overcome multimodal fitness landscapes by facilitating transitions into unexplored regions.
-
-### **5. Stagnation Detection and Escape**
-The algorithm monitors changes in best fitness across iterations.  
-If stagnation is detected, TOA selectively reinitializes weaker agents, injecting renewed diversity and reducing the risk of persistent entrapment in local minima.
+TOA emulates five major biological behaviors:
 
 ---
 
-These features collectively make TOA well-suited to complex, nonlinear, and multimodal optimization tasks, offering both adaptability and resilience through its biologically grounded search processes.
+### 1. Hunger-Driven Movement Mechanics
+
+Tardigrades regulate mobility based on resource availability.  
+In TOA, each agent’s movement intensity depends on its **hunger level** \( H_i \), which adaptively changes according to its performance.
+
+The hunger update follows:
+
+$$
+H_i(t+1) =
+\begin{cases}
+H_i(t) - \delta_h, & \text{if } f(\mathbf{x}_i) < \bar{f}(t) \\
+H_i(t) + \delta_p, & \text{otherwise}
+\end{cases}
+$$
+
+where:
+- \( H_i(t) \in [0, 1] \): hunger level of agent \( i \) at iteration \( t \),
+- \( f(\mathbf{x}_i) \): fitness of the agent,
+- \( \bar{f}(t) \): mean fitness of the population,
+- \( \delta_h, \delta_p \): hunger decrease/increase rates.
+
+Lower hunger reduces activity, encouraging fine exploitation; higher hunger induces active searching.
 
 ---
 
+### 2. Cryptobiosis Modeling
 
+When hunger surpasses a threshold \( H_i > H_c \), the agent enters a reduced-mobility state.  
+Its position update becomes minimal or frozen:
+
+$$
+\mathbf{x}_i(t+1) =
+\mathbf{x}_i(t) + \epsilon \cdot \mathcal{U}(-\eta, \eta)
+$$
+
+where:
+- \( \epsilon \in \{0, 1\} \): determines whether movement happens,
+- \( \mathcal{U}(-\eta, \eta) \): small uniform perturbation,
+- \( \eta \): scale factor controlling cryptobiotic drift.
+
+This helps stabilize late-stage search near optimal regions.
+
+---
+
+### 3. Elite-Based Learning and Cooperation
+
+A subset of **elite agents** \( E \subset N \) are selected based on best fitness values.
+
+Cooperation occurs either with the **global best** or a **random elite** member:
+
+$$
+\mathbf{x}_i(t+1) =
+\mathbf{x}_i(t) +
+\lambda \cdot H_i(t) \cdot (\mathbf{x}_E - \mathbf{x}_i(t))
+$$
+
+where:
+- \( \lambda \): cooperation coefficient (random factor),
+- \( H_i(t) \): hunger influence,
+- \( \mathbf{x}_E \): position of elite agent or global best.
+
+This introduces guided learning toward promising regions.
+
+---
+
+### 4. Lévy-Flight-Assisted Exploration
+
+To ensure global diversity, some agents apply **Lévy flight** steps:
+
+$$
+\mathbf{x}_i(t+1) = \mathbf{x}_i(t) + \alpha \cdot \text{Levy}(\beta)
+$$
+
+where:
+- \( \alpha \): step size scaling factor,
+- \( \text{Levy}(\beta) \): heavy-tailed Lévy distribution with parameter \( \beta \in (1,3] \),  
+  typically defined as:
+
+$$
+\text{Levy}(\beta) =
+\frac{\Gamma(1+\beta) \sin(\pi\beta / 2)}
+{\Gamma\left(\frac{1+\beta}{2}\right)\beta 2^{(\beta-1)/2}}
+\cdot \frac{u}{|v|^{1/\beta}}
+$$
+
+with \( u, v \sim \mathcal{N}(0, 1) \).
+
+This mechanism enables large exploratory jumps that help escape local minima.
+
+---
+
+### 5. Stagnation Detection and Escape
+
+TOA monitors fitness improvement using a **stagnation counter** \( S_t \):
+
+$$
+S_t =
+\begin{cases}
+S_{t-1} + 1, & |F_{\text{best}}(t) - F_{\text{best}}(t-1)| < \varepsilon \\
+0, & \text{otherwise}
+\end{cases}
+$$
+
+If \( S_t > S_{\max} \), the algorithm **reinitializes** some of the weakest agents:
+
+$$
+\mathbf{x}_i = \text{rand}(L_b, U_b)
+\quad \text{for } i \in W
+$$
+
+where \( W \) represents the subset of low-performance agents.  
+This refresh restores diversity after stagnation.
+
+---
+
+### 6. Position Update Summary
+
+By combining these dynamic mechanisms, the general agent update rule becomes:
+
+$$
+\mathbf{x}_i(t+1) =
+\mathbf{x}_i(t)
++ \alpha_1 \cdot \mathcal{E}_1
++ \alpha_2 \cdot \mathcal{E}_2
++ \alpha_3 \cdot \mathcal{E}_3
+$$
+
+where:
+- \( \mathcal{E}_1 \): exploitation effect (toward best or elite),
+- \( \mathcal{E}_2 \): exploration step (Lévy or random walk),
+- \( \mathcal{E}_3 \): cooperative or cryptobiotic movement,
+- \( \alpha_{1,2,3} \): adaptive coefficients linked to iteration progress and hunger.
+
+---
+
+## Key Characteristics
+
+- **Exploration–Exploitation Balance:** adaptive transition guided by hunger and iteration count.  
+- **Elite Coordination:** accelerates convergence through guided communication.  
+- **Lévy-Based Jumps:** preserve global diversity and exploration.  
+- **Stagnation Escape:** reintroduces randomness when stuck in local minima.  
+- **Cryptobiosis Phase:** precision refining near the global optimum.
+
+---
+
+*Developed by Ahmed Mohamed Zaki & El‑Sayed M. El‑Kenawy.*
