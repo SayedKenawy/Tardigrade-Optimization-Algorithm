@@ -31,7 +31,7 @@ $$
 
 Lower hunger reduces activity, encouraging fine exploitation; higher hunger induces active searching.
 
----
+
 
 ### 2. Cryptobiosis Modeling
 
@@ -112,13 +112,13 @@ This refresh restores diversity after stagnation.
 
 By combining these dynamic mechanisms, the general agent update rule becomes:
 
-$$
+```math
 \mathbf{x}_i(t+1) =
 \mathbf{x}_i(t)
 + \alpha_1 \cdot \mathcal{E}_1
 + \alpha_2 \cdot \mathcal{E}_2
 + \alpha_3 \cdot \mathcal{E}_3
-$$
+```
 
 
 
