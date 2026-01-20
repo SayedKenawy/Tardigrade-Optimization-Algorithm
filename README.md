@@ -5,13 +5,12 @@ The **Tardigrade Optimization Algorithm (TOA)** is a contemporary **bio-inspired
 This algorithm integrates **exploration–exploitation balancing**, **hunger-driven adaptation**, and **cooperative movement modeling** to provide a versatile and robust optimization framework.  
 
 
----
+
 
 ## Algorithm Overview
 
 TOA emulates five major biological behaviors:
 
----
 
 ### 1. Hunger-Driven Movement Mechanics
 
@@ -28,11 +27,7 @@ H_i(t) + \delta_p, & \text{otherwise}
 \end{cases}
 $$
 
-where:
-- \( H_i(t) \in [0, 1] \): hunger level of agent \( i \) at iteration \( t \),
-- \( f(\mathbf{x}_i) \): fitness of the agent,
-- \( \bar{f}(t) \): mean fitness of the population,
-- \( \delta_h, \delta_p \): hunger decrease/increase rates.
+
 
 Lower hunger reduces activity, encouraging fine exploitation; higher hunger induces active searching.
 
@@ -48,14 +43,7 @@ $$
 \mathbf{x}_i(t) + \epsilon \cdot \mathcal{U}(-\eta, \eta)
 $$
 
-where:
-- \( \epsilon \in \{0, 1\} \): determines whether movement happens,
-- \( \mathcal{U}(-\eta, \eta) \): small uniform perturbation,
-- \( \eta \): scale factor controlling cryptobiotic drift.
 
-This helps stabilize late-stage search near optimal regions.
-
----
 
 ### 3. Elite-Based Learning and Cooperation
 
@@ -69,14 +57,7 @@ $$
 \lambda \cdot H_i(t) \cdot (\mathbf{x}_E - \mathbf{x}_i(t))
 $$
 
-where:
-- \( \lambda \): cooperation coefficient (random factor),
-- \( H_i(t) \): hunger influence,
-- \( \mathbf{x}_E \): position of elite agent or global best.
 
-This introduces guided learning toward promising regions.
-
----
 
 ### 4. Lévy-Flight-Assisted Exploration
 
@@ -98,11 +79,11 @@ $$
 \cdot \frac{u}{|v|^{1/\beta}}
 $$
 
-with \( u, v \sim \mathcal{N}(0, 1) \).
+
 
 This mechanism enables large exploratory jumps that help escape local minima.
 
----
+
 
 ### 5. Stagnation Detection and Escape
 
@@ -123,10 +104,9 @@ $$
 \quad \text{for } i \in W
 $$
 
-where \( W \) represents the subset of low-performance agents.  
+where ( W ) represents the subset of low-performance agents.  
 This refresh restores diversity after stagnation.
 
----
 
 ### 6. Position Update Summary
 
@@ -140,13 +120,8 @@ $$
 + \alpha_3 \cdot \mathcal{E}_3
 $$
 
-where:
-- \( \mathcal{E}_1 \): exploitation effect (toward best or elite),
-- \( \mathcal{E}_2 \): exploration step (Lévy or random walk),
-- \( \mathcal{E}_3 \): cooperative or cryptobiotic movement,
-- \( \alpha_{1,2,3} \): adaptive coefficients linked to iteration progress and hunger.
 
----
+
 
 ## Key Characteristics
 
@@ -156,6 +131,4 @@ where:
 - **Stagnation Escape:** reintroduces randomness when stuck in local minima.  
 - **Cryptobiosis Phase:** precision refining near the global optimum.
 
----
 
-*Developed by Ahmed Mohamed Zaki & El‑Sayed M. El‑Kenawy.*
